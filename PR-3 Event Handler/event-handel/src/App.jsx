@@ -1,4 +1,4 @@
-import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
 
 const products = [
@@ -24,33 +24,58 @@ export default function ProductFilter() {
   };
 
   return (
-    <div className="bg-beige min-h-screen p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">Apple Store</h1>
-      <div className="flex justify-center gap-4 mb-6">
-       <center>
-       {["All", "iPhone", "Watch", "AirPods", "Mac"].map((category) => (
+    <div className="bg-light p-5">
+      <h1 className="text-center text-4xl font-bold mb-6 text-dark">Apple Store</h1>
+      
+      {/* Category Filter Buttons */}
+      <div className="d-flex justify-content-center mb-4">
+        {["All", "iPhone", "Watch", "AirPods", "Mac"].map((category) => (
           <button
             key={category}
             onClick={() => handleFilter(category)}
-            className="bg-blue-500  px-4 py-2 rounded-lg hover:bg-blue-700 transition ms-3 btn-dark"
+            className="btn btn-success m-2 px-4 py-2 rounded-pill text-white fw-bold shadow-sm hover-shadow"
+            style={{ transition: "all 0.3s ease" }}
           >
             {category}
           </button>
         ))}
-       </center>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {/* Product Cards */}
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 g-4">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="bg-white p-4 rounded-lg shadow-lg text-center">
-            <img src={product.image} alt={product.name} className="w-40 mx-auto mb-4"  style={{ width: "400px", height: "400px" }}  />
-            <h2 className="text-lg font-semibold">{product.name}</h2>
-            <p className="text-gray-600">{product.price}</p>
+          <div key={product.id} className="col">
+            <div className="card shadow-lg rounded-lg border-0 p-3 hover-shadow">
+              <img 
+                src={product.image} 
+                alt={product.name} 
+                className="card-img-top rounded-top" 
+                style={{ width: "100%", height: "300px", objectFit: "contain", transition: "transform 0.3s ease" }}
+                onMouseOver={(e) => e.target.style.transform = "scale(1.05)"}
+                onMouseOut={(e) => e.target.style.transform = "scale(1)"}
+              />
+              <div className="card-body text-center">
+                <h5 className="card-title text-primary fw-bold">{product.name}</h5>
+                <p className="card-text text-muted">{product.category}</p>
+                <p className="card-text text-dark fs-5">{product.price}</p>
+                <button 
+                  className="btn btn-outline-primary w-100 mt-2"
+                  style={{
+                    transition: "background-color 0.3s, color 0.3s",
+                  }}
+                  onMouseOver={(e) => e.target.style.backgroundColor = "#1a73e8"}
+                  onMouseOut={(e) => e.target.style.backgroundColor = "transparent"}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
           </div>
         ))}
       </div>
     </div>
   );
 }
+
 
 
