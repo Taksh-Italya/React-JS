@@ -1,82 +1,118 @@
 import React, { useState } from 'react';
 import { FaBook, FaEdit } from 'react-icons/fa';
-import 'bootstrap/dist/css/bootstrap.css';
+import { Button, Table, Modal, Form } from 'react-bootstrap';
+import "bootstrap/dist/css/bootstrap.min.css"
 
-const initialData = [
-  { id: 1, title: 'JavaScript', description: 'JavaScript is among...' },
-  { id: 2, title: 'Sass', description: 'Learn from' },
-  { id: 3, title: 'React', description: 'Learn from react.js' },
-  { id: 4, title: 'Node', description: 'Nodejs documentation' },
-  { id: 5, title: 'EcmaScript', description: 'Learn from es6.org' },
-  { id: 6, title: 'Angular', description: 'One framework Mobile...' },
-];
+function App() {
+  const [items, setItems] = useState([
+    { id: 1, title: "JavaScript", description: "JavaScript is among..." },
+    { id: 2, title: "Sass", description: "Learn from" },
+    { id: 3, title: "React", description: "Learn from react.js" },
+    { id: 4, title: "Node", description: "Nodejs documentation" },
+    { id: 5, title: "EcmaScript", description: "Learn from es6.org" },
+    { id: 6, title: "Angular", description: "One framework Mobile..." },
+  ]);
 
-export default function App() {
-  const [data, setData] = useState(initialData);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [show, setShow] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  const [form, setForm] = useState({ title: '', description: '' });
 
-  const handleAdd = () => {
-    if (title && description) {
-      const newItem = {
-        id: Date.now(),
-        title,
-        description,
-      };
-      setData([...data, newItem]);
-      setTitle('');
-      setDescription('');
+  const handleShow = () => setShow(true);
+  const handleClose = () => {
+    setForm({ title: '', description: '' });
+    setEditIndex(null);
+    setShow(false);
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = () => {
+    if (editIndex !== null) {
+      const updated = items.map((item, idx) =>
+        idx === editIndex ? { ...item, ...form } : item
+      );
+      setItems(updated);
+    } else {
+      setItems([...items, { id: items.length + 1, ...form }]);
     }
+    handleClose();
+  };
+
+  const handleEdit = (index) => {
+    setEditIndex(index);
+    setForm(items[index]);
+    handleShow();
+  };
+
+  const handleDelete = (index) => {
+    const filtered = items.filter((_, idx) => idx !== index);
+    setItems(filtered);
   };
 
   return (
-    <div className="bg-primary min-h-screen text-white p-5">
-      <div className="flex items-center gap-4">
-        <h1 className="text-3xl font-bold">REACT CRUD</h1>
+    <div className="bg-primary vh-100 p-5">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="text-white d-flex align-items-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="React" width="50" height="50" className="me-2" />
+          <h3>REACT CRUD</h3>
+        </div>
+        <Button variant="warning" onClick={handleShow}>Add</Button>
       </div>
 
-      <div className="mt-5 flex gap-3">
-        <input
-          type="text"
-          placeholder="Title"
-          className="form-control w-1/4"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          className="form-control w-1/2"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <button onClick={handleAdd} className="btn btn-warning text-white font-bold">Add</button>
-      </div>
-
-      <div className="relative mt-5">
-        <table className="table table-bordered bg-white text-black w-full">
-          <thead className="text-primary">
+      <div className="bg-white rounded p-3">
+        <Table bordered hover>
+          <thead className="table-light">
             <tr>
               <th><FaBook /></th>
               <th>Title</th>
               <th>Description</th>
               <th>Action</th>
-              <th><input type="checkbox" /></th>
             </tr>
           </thead>
           <tbody>
-            {data.map((item) => (
+            {items.map((item, index) => (
               <tr key={item.id}>
                 <td><FaBook /></td>
                 <td>{item.title}</td>
                 <td>{item.description}</td>
-                <td><FaEdit className="text-success cursor-pointer" /></td>
-                <td><input type="checkbox" /></td>
+                <td>
+                  <Button variant="outline-success" size="sm" className="me-2" onClick={() => handleEdit(index)}>
+                    <FaEdit />
+                  </Button>
+                  <Button variant="outline-danger" size="sm" onClick={() => handleDelete(index)}>🗑️</Button>
+                </td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
       </div>
+
+      {/* Modal for Add/Edit */}
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>{editIndex !== null ? "Edit Item" : "Add Item"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Title</Form.Label>
+              <Form.Control type="text" name="title" value={form.title} onChange={handleChange} />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Description</Form.Label>
+              <Form.Control type="text" name="description" value={form.description} onChange={handleChange} />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+          <Button variant="primary" onClick={handleSave}>Save</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
+
+export default App;
